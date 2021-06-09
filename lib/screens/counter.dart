@@ -7,19 +7,60 @@ import 'package:provider/provider.dart';
 import 'package:task_app/providers/auth.dart';
 import 'package:task_app/screens/weather_screen.dart';
 
+// class CounterStorage {
+// Future get _localPath async {
+// final directory = await getApplicationDocumentsDirectory();
+
+// return directory.path;
+// }
+
+// Future get _localFile async {
+// final path = await _localPath;
+// return File('$path/counter.txt');
+// }
+
+// Future readCounter() async {
+// try {
+// final file = await _localFile;
+
+// // Read the file
+// String contents = await file.readAsString();
+
+// return int.parse(contents);
+// } catch (e) {
+// // If we encounter an error, return 0
+// return 0;
+// }
+// }
+
+// Future writeCounter(int counter) async {
+// final file = await _localFile;
+
+// // Write the file
+// return file.writeAsString('$counter');
+// }
+// }
+
 class Counter extends StatefulWidget {
+//   final CounterStorage storage;
+  
+// Counter({Key key, @required this.storage}):super(key: key);
+
   @override
   _CounterState createState() => _CounterState();
 }
 
 class _CounterState extends State<Counter> {
-  int _counter = 0;
+  int _counter=0;
+
+
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
     // print("######################################### Dir"+directory.path.toString());
     return directory.path;
   }
+
 
   Future<File> get _localFile async {
     // print("#################################### LocalFile ");
@@ -32,6 +73,7 @@ class _CounterState extends State<Counter> {
     final file = await _localFile;
     return file.writeAsString("$_counter");
   }
+
 
   Future<int> readCounter() async{
     try{
@@ -60,12 +102,22 @@ class _CounterState extends State<Counter> {
   }
 
   void _resetCounter() async {
+    int count= await readCounter();
     setState(() {
-      _counter = 0;
+      _counter=count;
+      
     });
     await writeCounter(_counter);
     // print('############################################ reset');
   }
+  // @override
+  // void initState(){
+  //   super.initState();
+  //   widget.storage.readCounter().then();
+  //   setState(() {
+  //         _counter=value;
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {

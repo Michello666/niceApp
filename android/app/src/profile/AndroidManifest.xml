@@ -5,3 +5,5 @@
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
+<manifest package="..." ... >
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

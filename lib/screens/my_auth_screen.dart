@@ -1,7 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:task_app/providers/auth.dart';
-import 'package:task_app/screens/counter.dart';
 
 enum FormType { login, register }
 
@@ -11,7 +10,7 @@ class MyAuthPage extends StatefulWidget {
 }
 
 class _MyAuthPageState extends State<MyAuthPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey();
+  // final GlobalKey<FormState> _formKey = GlobalKey();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
