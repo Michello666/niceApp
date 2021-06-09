@@ -91,6 +91,10 @@ class _MyAuthPageState extends State<MyAuthPage> {
               _email);
 
       await Provider.of<Auth>(context, listen: false).signUp(_email, _pass);
+      _formType=FormType.login;
+      Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => MyAuthPage()));
     }
     // setState(() {
     //   _isLoading = false;
