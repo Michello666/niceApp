@@ -1,6 +1,10 @@
 import 'dart:io';
 
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:task_app/providers/auth.dart';
 import 'package:task_app/screens/weather_screen.dart';
 
 class Counter extends StatefulWidget {
@@ -9,45 +13,58 @@ class Counter extends StatefulWidget {
 }
 
 class _CounterState extends State<Counter> {
-  int _counter;
+  int _counter = 0;
 
-  Future<String> getFilePath() async {
-    String filePath = "lib\\counter_lib\\counterState.txt";
-    return filePath;
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    // print("######################################### Dir"+directory.path.toString());
+    return directory.path;
   }
 
-  void saveFile() async {
-    File file = File(await getFilePath());
-    print("saving to file: " + file.readAsStringSync());
-    file.writeAsString("$_counter");
+  Future<File> get _localFile async {
+    // print("#################################### LocalFile ");
+    final path = await _localPath;
+    return File("$path/counter.txt");
   }
 
-  void setCounterValuefromFile() async {
-    File file = File(await getFilePath());
-    print("setting counter from file: " + file.readAsStringSync());
-    int counterValue = int.parse(await file.readAsString());
-    this._counter = counterValue;
+  Future<File> writeCounter(int counter) async {
+    // print("############################################IN WriteCounter");
+    final file = await _localFile;
+    return file.writeAsString("$_counter");
   }
 
-  void _incrementCounter() {
+  Future<int> readCounter() async{
+    try{
+      final file= await _localFile;
+      final insides= await file.readAsString();
+      return int.parse(insides);
+    }catch(e){
+      return 0;
+    }
+  }
+
+  void _incrementCounter() async {
     setState(() {
       _counter++;
-      saveFile();
     });
+    await writeCounter(_counter);
+    // print('############################################ incrementing');
   }
 
-  void _decrementCounter() {
+  void _decrementCounter() async {
     setState(() {
       _counter--;
-      saveFile();
     });
+    await writeCounter(_counter);
+    // print('############################################ decrementing');
   }
 
-  void _resetCounter() {
+  void _resetCounter() async {
     setState(() {
       _counter = 0;
-      saveFile();
     });
+    await writeCounter(_counter);
+    // print('############################################ reset');
   }
 
   @override
@@ -55,7 +72,20 @@ class _CounterState extends State<Counter> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Counter"),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Counter"),
+            IconButton(
+              icon: Icon(Icons.logout),
+              tooltip: "Logout",
+              color: Colors.red,
+              onPressed: () {
+                Provider.of<Auth>(context, listen: false).logOut();
+              },
+            )
+          ],
+        ),
       ),
       body: Center(
         // alignment: Alignment.center,

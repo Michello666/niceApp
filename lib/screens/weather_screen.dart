@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:task_app/models/WeatherData.dart';
 import 'package:task_app/models/WeatherTileData.dart';
+import 'package:task_app/providers/auth.dart';
+import 'package:task_app/screens/my_auth_screen.dart';
 import 'package:task_app/widgets/weather.dart';
 import 'package:task_app/widgets/weather_tile.dart';
 import 'package:http/http.dart' as http;
@@ -31,7 +34,22 @@ class _WeatherScreenState extends State<WeatherScreen> {
       backgroundColor: Colors.deepPurple,
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Wether"),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Weather"),
+            IconButton(
+              icon: Icon(Icons.logout),
+              tooltip: "Logout",
+              color: Colors.red,
+              onPressed: () {
+                Provider.of<Auth>(context, listen: false).logOut();
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MyAuthPage()));
+              },
+            )
+          ],
+        ),
       ),
       body: Center(
         child: Column(
@@ -99,11 +117,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
     final weatherResponse = await http.get(weatherUrl);
     final weatherTileResponse = await http.get(weatherTileUrl);
 
-    if(weatherResponse.statusCode==200 && weatherTileResponse.statusCode==200){
-      return setState((){
-        weatherData= WeatherData.fromJson(jsonDecode(weatherResponse.body));
-        weatherTileData= WeatherTileData.fromJson(jsonDecode(weatherTileResponse.body));
-        isLoading=false;
+    if (weatherResponse.statusCode == 200 &&
+        weatherTileResponse.statusCode == 200) {
+      return setState(() {
+        weatherData = WeatherData.fromJson(jsonDecode(weatherResponse.body));
+        weatherTileData =
+            WeatherTileData.fromJson(jsonDecode(weatherTileResponse.body));
+        isLoading = false;
       });
     }
   }

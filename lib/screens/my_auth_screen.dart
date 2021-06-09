@@ -75,7 +75,13 @@ class _MyAuthPageState extends State<MyAuthPage> {
     //   _isLoading = true;
     // });
     if (_formType == FormType.login) {
-      // Log user in
+       print(
+          "############################################################################### pass:" +
+              _pass);
+      print(
+          "############################################################################### email:" +
+              _email);
+      await Provider.of<Auth>(context, listen: false).signIn(_email,_pass);
     } else {
       print(
           "############################################################################### pass:" +
@@ -148,10 +154,7 @@ class _MyAuthPageState extends State<MyAuthPage> {
         child: Column(
           children: [
             ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Counter()));
-                },
+                onPressed: _submit,
                 child: Text("Login")),
             TextButton(
               onPressed: _changeForm,
