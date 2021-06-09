@@ -1,123 +1,88 @@
 import 'dart:io';
-
+import 'dart:js';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:task_app/providers/auth.dart';
 import 'package:task_app/screens/weather_screen.dart';
 
-// class CounterStorage {
-// Future get _localPath async {
-// final directory = await getApplicationDocumentsDirectory();
-
-// return directory.path;
-// }
-
-// Future get _localFile async {
-// final path = await _localPath;
-// return File('$path/counter.txt');
-// }
-
-// Future readCounter() async {
-// try {
-// final file = await _localFile;
-
-// // Read the file
-// String contents = await file.readAsString();
-
-// return int.parse(contents);
-// } catch (e) {
-// // If we encounter an error, return 0
-// return 0;
-// }
-// }
-
-// Future writeCounter(int counter) async {
-// final file = await _localFile;
-
-// // Write the file
-// return file.writeAsString('$counter');
-// }
-// }
-
 class Counter extends StatefulWidget {
-//   final CounterStorage storage;
-  
-// Counter({Key key, @required this.storage}):super(key: key);
+  // Counter({Key key, @required this.storage}) : super(key: key);
 
   @override
   _CounterState createState() => _CounterState();
 }
 
 class _CounterState extends State<Counter> {
-  int _counter=0;
-
-
-
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    // print("######################################### Dir"+directory.path.toString());
-    return directory.path;
-  }
-
-
-  Future<File> get _localFile async {
-    // print("#################################### LocalFile ");
-    final path = await _localPath;
-    return File("$path/counter.txt");
-  }
-
-  Future<File> writeCounter(int counter) async {
-    // print("############################################IN WriteCounter");
-    final file = await _localFile;
-    return file.writeAsString("$_counter");
-  }
-
-
-  Future<int> readCounter() async{
-    try{
-      final file= await _localFile;
-      final insides= await file.readAsString();
-      return int.parse(insides);
-    }catch(e){
+  int _counter = 0;
+  Future<int> _getIntFromSharedPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    final startupNumber = prefs.getInt("startupNumber");
+    if (startupNumber == null) {
       return 0;
     }
+    return startupNumber;
   }
 
-  void _incrementCounter() async {
-    setState(() {
-      _counter++;
-    });
-    await writeCounter(_counter);
-    // print('############################################ incrementing');
+  Future<void> _setInitNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    print("##########################################:    $prefs");
+    final intFromPrefs = await _getIntFromSharedPref();
+    print("##########################################:    $intFromPrefs");
+    if (intFromPrefs == null) {
+      setState(() {
+        _counter = 0;
+      });
+    } else
+      setState(() {
+        _counter = intFromPrefs;
+      });
+      prefs.setInt("startupNumber", _counter);
   }
 
-  void _decrementCounter() async {
+  Future<void> _resetCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    print("################################################# RESET COUNTER");
+    print(prefs.getInt("startupNumber"));
+    await prefs.setInt("startupNumber", 0);
+
     setState(() {
-      _counter--;
-    });
-    await writeCounter(_counter);
-    // print('############################################ decrementing');
+          _counter=0;
+        });
   }
 
-  void _resetCounter() async {
-    int count= await readCounter();
-    setState(() {
-      _counter=count;
-      
-    });
-    await writeCounter(_counter);
-    // print('############################################ reset');
+  @override
+  void initState() {
+    super.initState();
+    _setInitNumber();
   }
-  // @override
-  // void initState(){
-  //   super.initState();
-  //   widget.storage.readCounter().then();
-  //   setState(() {
-  //         _counter=value;
-  //       });
-  // }
+
+  Future<void> _incrementCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    int lastStartupNumber = await _getIntFromSharedPref();
+    print("####################################################: $lastStartupNumber");
+    int currentSturtupNumber = ++lastStartupNumber;
+
+    print("##################################:     $currentSturtupNumber");
+    await prefs.setInt("startupNumber", currentSturtupNumber);
+    setState(() {
+      _counter = currentSturtupNumber;
+    });
+  }
+
+  Future<void> _decrementCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    int lastStartupNumber = await _getIntFromSharedPref();
+    print("####################################################: $lastStartupNumber");
+    int currentStartupNumber = --lastStartupNumber;
+    print("####################################################: $currentStartupNumber");
+    await prefs.setInt("startupNumber", currentStartupNumber);
+    setState(() {
+      _counter = currentStartupNumber;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,3 +160,79 @@ class _CounterState extends State<Counter> {
     );
   }
 }
+  // Future<String> get _localPath async {
+  //   final directory = await getApplicationDocumentsDirectory();
+  //   // print("######################################### Dir"+directory.path.toString());
+  //   return directory.path;
+  // }
+
+  // Future<File> get _localFile async {
+  //   // print("#################################### LocalFile ");
+  //   final path = await _localPath;
+  //   return File("$path/counter.txt");
+  // }
+
+  // Future<File> writeCounter(int counter) async {
+  //   // print("############################################IN WriteCounter");
+  //   final file = await _localFile;
+  //   return file.writeAsString("$_counter");
+  // }
+
+  // Future<int> readCounter() async {
+  //   try {
+  //     final file = await _localFile;
+  //     final insides = await file.readAsString();
+  //     return int.parse(insides);
+  //   } catch (e) {
+  //     return 0;
+  //   }
+  // }
+
+
+
+  // Future<File> _resetCounter() async {
+  //   setState(() {
+  //     _counter = 0;
+  //   });
+  //   return widget.storage.writeCounter(_counter);
+  //   // print('############################################ reset');
+  // }
+
+// class CounterStorage {
+//   Future<String> get _localPath async {
+//     final directory = await getApplicationDocumentsDirectory();
+
+//     return directory.path;
+//   }
+
+//   Future<File> get _localFile async {
+//     final path = await _localPath;
+//     return File('$path/counter.txt');
+//   }
+
+//   Future<int> readCounter() async {
+//     try {
+//       final file = await _localFile;
+
+//       // Read the file
+//       final contents = await file.readAsString();
+//       if(contents==null){
+//         return 0;
+//       }
+//       return int.parse(contents);
+//     } catch (e) {
+//       // If encountering an error, return 0
+//       return 0;
+//     }
+//   }
+
+//   Future<File> writeCounter(int counter) async {
+//     final file = await _localFile;
+
+//     // Write the file
+//     return file.writeAsString('$counter');
+//   }
+// }
+
+ 
+
